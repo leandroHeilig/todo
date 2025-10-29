@@ -4,9 +4,12 @@ class Project:
     def __init__(self, name):
         self.name = name
         self.tasks = []
+        
+    def __interact__(self, other):
+        return self.tasks.__interact__(other)
 
-    def add_task(self, task):
-        self.tasks.append(Task(task))
+    def add_task(self, task, due_date=None):
+        self.tasks.append(Task(task, due_date))
 
     def get_pending_tasks(self):
         return [task for task in self.tasks if not task.completed]
@@ -31,14 +34,22 @@ class Task:
         self.completed = True
 
     def __str__(self):
-        status = "Completed" if self.completed else "Pending"
-        due = f", Due: {self.due_date}" if self.due_date else ""
-        return f"Task: {self.description}{due}, Status: {status}"
-
+        status = []
+        if self.completed:
+            status.append("(Completed)")
+        elif self.due_date:
+            if datetime.now() > self.due_date:
+                status.append("(Overdue)")
+            else: 
+                days_left = (self.due_date - datetime.now()).days
+                status.append(f"(Due in {days_left} days)")
+        return f"{self.description} {' '.join(status)}"
+        
 def main():
     project = Project("Sample Project")
-    project.add_task("Passar roupa")
-    project.add_task("Lavar Louça")
+    project.add_task("Passar roupa",datetime.now())
+    project.add_task("Lavar Louça", datetime(2025, 12, 31))
+    project.add_task("Comprar mantimentos", datetime.now()+ datetime.timedelta(days=3, minutes=40))
 
     print(project)
 
