@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class Project:
     def __init__(self, name):
@@ -44,12 +44,30 @@ class Task:
                 days_left = (self.due_date - datetime.now()).days
                 status.append(f"(Due in {days_left} days)")
         return f"{self.description} {' '.join(status)}"
+    
+class RecurringTask(Task):
+    def __init__(self, description, due_date, interval_days=7):
+        super().__init__(description, due_date)
+        self.interval_days = interval_days
+       
+
+    def mark_complete(self):
+        super().mark_complete()
+        new_due_date = datetime.now() + datetime.timedelta(days=self.interval_days)
+        return RecurringTask(self.description, new_due_date, self.interval_days)
+        # Logic to create a new task after the interval can be added here
+
+    def mark_complete(self):
+        super().mark_complete()
+        # Logic to create a new task after the interval can be added here
         
 def main():
     project = Project("Sample Project")
     project.add_task("Passar roupa",datetime.now())
     project.add_task("Lavar Louça", datetime(2025, 12, 31))
-    project.add_task("Comprar mantimentos", datetime.now()+ datetime.timedelta(days=3, minutes=40))
+    project.add_task("Comprar mantimentos", datetime.now()+ timedelta(days=3))
+    #project.tasks.append(RecurringTask("Pagar contas", datetime.now(), 7))
+    project.tasks.append(RecurringTask("Pagar contas", datetime.now(), 7))
 
     print(project)
 
